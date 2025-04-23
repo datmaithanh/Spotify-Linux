@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'chat',
     'corsheaders',
     'emails',
+    
 
 ]
 ASGI_APPLICATION = "Bespotify.asgi.application"
@@ -73,7 +74,8 @@ MIDDLEWARE = [
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-    )
+    ),
+    
 }
 
 AUTH_USER_MODEL = 'users.CustomUser'
@@ -165,6 +167,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
+    "http://127.0.0.1:5173",
 ]
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

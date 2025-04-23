@@ -1,21 +1,49 @@
-import React, { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { LuLibrary } from "react-icons/lu";
-import { Plus } from "lucide-react";
-import { PiMusicNotesPlus } from "react-icons/pi";
 import { FaSearch } from "react-icons/fa";
+import { deleteLikedSong, getAllSongsPlaylist } from "../apis/songApi";
+import { PlayerContext } from "../context/PlayerContext";
+import { CiCircleMinus } from "react-icons/ci";
 
 const Sidebar = () => {
-    const navigate = useNavigate();
-    const username = "datmaithanh";
-
-    const [selectedTab, setSelectedTab] = useState("playlist");
+    const { playWithId } = useContext(PlayerContext);
+    const [selectedTab, setSelectedTab] = useState("playlists");
     const [roomId, setRoomId] = useState("");
     const [connected, setConnected] = useState(false);
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState("");
     const socketRef = useRef(null);
+    const [songPlaylist, setSongPlaylist] = useState([]);
+    
+
+   
+    useEffect(() => {
+        const handlePlaylistUpdated = async () => {
+            const data = await getAllSongsPlaylist();
+            setSongPlaylist(data);
+        };
+    
+        window.addEventListener("playlist-updated", handlePlaylistUpdated);
+        
+        return () => {
+            window.removeEventListener("playlist-updated", handlePlaylistUpdated);
+        };
+    }, []);
+    
+    useEffect(() => {
+        const fetchAllSongsPlaylist = async () => {
+            const data = await getAllSongsPlaylist();
+            setSongPlaylist(data);
+        };
+    
+        if (songPlaylist.length === 0) {
+            fetchAllSongsPlaylist();
+        }
+    }, []); 
+    
+    
+
+    
 
     useEffect(() => {
         if (!roomId || !connected) return;
@@ -58,6 +86,16 @@ const Sidebar = () => {
         if (roomId.trim()) setConnected(true);
     };
 
+    function handleUnlike(songId) {
+        deleteLikedSong(songId).then(() => {
+            setSongPlaylist((prevSongs) =>
+                prevSongs.filter((song) => song.id !== songId)
+            );
+            
+        });
+    }
+    
+
     return (
         <div className="sidebar w-[25%] h-full p-2 hidden lg:flex flex-col gap-2 text-white">
             {/* Top Section */}
@@ -65,35 +103,6 @@ const Sidebar = () => {
                 <div className="flex items-center gap-2 mb-6 m-3">
                     <LuLibrary className="w-6 h-6 text-white" />
                     <span className="font-bold">Your Library</span>
-                    {/* <div className="ml-auto">
-                        <Menu>
-                            <MenuButton className="cursor-pointer flex items-center gap-2 bg-zinc-900 hover:bg-zinc-800 text-white px-4 py-2 rounded-full transition-colors">
-                                <Plus size={20} />
-                                <span className="font-medium">Create</span>
-                            </MenuButton>
-                            <MenuItems className="text-white p-1 rounded-sm bg-[#1F1F1F] z-999">
-                                <MenuItem
-                                    onClick={() => {}}
-                                    className="flex items-center p-3 hover:bg-zinc-800 cursor-pointer group rounded-sm"
-                                >
-                                    <div className="flex items-center">
-                                        <div className="p-3 rounded-full bg-[#3e3e3e] mr-3">
-                                            <PiMusicNotesPlus
-                                                size={30}
-                                                className="text-white group-hover:text-[#1ed760] transition-all group-hover:rotate-4"
-                                            />
-                                        </div>
-                                        <div>
-                                            <p className="font-medium">Playlist</p>
-                                            <p className="text-gray-400 text-sm">
-                                                Build a playlist with songs
-                                            </p>
-                                        </div>
-                                    </div>
-                                </MenuItem>
-                            </MenuItems>
-                        </Menu>
-                    </div> */}
                 </div>
 
                 {/* Navigation Buttons (4 nút nhỏ, mỗi cái 20%) */}
@@ -124,9 +133,45 @@ const Sidebar = () => {
 
             {/* Tab Content */}
             <div className="bg-[#121212] h-[85%] rounded p-4 text-sm text-white overflow-y-auto">
-                {selectedTab === "playlist" && <div>🎵 Danh sách Playlist</div>}
-                {selectedTab === "album" && <div>💿 Danh sách Album</div>}
-                {selectedTab === "artist" && <div>👨‍🎤 Danh sách Nghệ sĩ</div>}
+                {selectedTab === "playlists" && (
+                    <div>
+                        <h2 className="text-sm font-bold mb-3">
+                            📂 Danh sách liked
+                        </h2>
+                        {songPlaylist.map((item, index) => (
+                            <div
+                                key={index}
+                                className="flex items-center gap-2 p-2 hover:bg-[#1e1e1e] rounded-lg cursor-pointer"
+                                onClick={() => playWithId(item.song?.id)}
+                            >
+                                <img
+                                    className="w-10 h-10 rounded-full"
+                                    src={item.song?.image}
+                                    alt={item.title}
+                                />
+                                <div className="flex flex-col">
+                                    <span className="font-semibold">
+                                        {item.song?.title}
+                                    </span>
+                                    <span className="text-xs text-gray-400">
+                                        {item.desc}
+                                    </span>
+                                </div>
+                                <div
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleUnlike(item.id);
+                                    }}
+                                    className="ml-auto text-2xl text-slate-300 hover:text-white transition duration-200 cursor-pointer"
+                                >
+                                    <CiCircleMinus />
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+                {selectedTab === "artists" && <div>💿 Danh sách Nghệ sĩ</div>}
+                {selectedTab === "albums" && <div>👨‍🎤 Danh sách Album</div>}
 
                 {selectedTab === "chat" && (
                     <div className="bg-[#1e1e1e] p-4 rounded-2xl shadow-lg border border-[#333]">

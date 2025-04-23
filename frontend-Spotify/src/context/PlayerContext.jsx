@@ -15,6 +15,12 @@ const PlayerContextProvider = (props) => {
         currentTime: { second: 0, minute: 0 },
         totalTime: { second: 0, minute: 0 },
     });
+    const [playlist, setPlaylist] = useState([]);
+
+    const refreshPlaylist = async () => {
+        const updatedPlaylist = await getPlaylist(); // Gọi API để lấy playlist mới
+        setPlaylist(updatedPlaylist);
+    };
 
     // Lấy danh sách bài hát từ API
     useEffect(() => {

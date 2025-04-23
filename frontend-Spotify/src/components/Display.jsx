@@ -7,6 +7,7 @@ import Profile from "./Profile";
 import ForgotPassword from "./ForgotPassword";
 import Register from "./Register";
 import Premium from "./Premium";
+import DisplayArtist from "./DisplayArtist";
 
 const Display = () => {
     return (
@@ -14,6 +15,7 @@ const Display = () => {
             <Routes>
                 <Route path="/" element={<DisplayHome />} />
                 <Route path="/album/:id" element={<DisplayAlbum />} />
+                <Route path="/artist/:id" element={<DisplayArtist />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/profile" element={<Profile />} />
