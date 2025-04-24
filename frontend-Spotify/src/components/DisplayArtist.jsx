@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { PlayerContext } from "../context/PlayerContext";
 import { assets } from "../assets/assets";
-import { getAllArtist } from "../apis/artistApi";
+import { addToArtistList, getAllArtist } from "../apis/artistApi";
 import { CiCirclePlus } from "react-icons/ci";
 
 const DisplayArtist = () => {
@@ -14,14 +14,28 @@ const DisplayArtist = () => {
 
     useEffect(() => {
         const fetchArtists = async () => {
+            setArtists([]);
+            setAlbums([]);
+            setSongs([]);
+    
             const data = await getAllArtist();
-            console.log("song", data[id - 1]);
-            setArtists(data[id - 1]);
-            setAlbums(data[id - 1].albums[0]);
-            setSongs(data[id - 1].albums[0].songs);
+            const currentArtist = data[id - 1];
+    
+            if (currentArtist) {
+                setArtists(currentArtist);
+                const firstAlbum = currentArtist.albums?.[0];
+                if (firstAlbum) {
+                    setAlbums(firstAlbum);
+                    setSongs(firstAlbum.songs || []);
+                } else {
+                    setSongs([]);
+                }
+            }
         };
         fetchArtists();
-    }, []);
+    }, [id]);
+    
+    
     const formatDuration = (seconds) => {
         const mins = Math.floor(seconds / 60);
         const secs = seconds % 60;
@@ -41,6 +55,7 @@ const DisplayArtist = () => {
                     <h2 className="text-5xl font-bold mb-4 md:text-7xl">
                         {artists?.name}
                     </h2>
+
                     <h4>{artists?.bio}</h4>
                     <p className="mt-1 flex items-center gap-1">
                         <img
@@ -50,6 +65,20 @@ const DisplayArtist = () => {
                         />
                         <b>Spotify</b>
                     </p>
+                </div>
+                <div
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        console.log (artists?.id);
+                        addToArtistList(artists?.id).then(() => {
+                            const event = new Event("artist-updated");
+                            window.dispatchEvent(event);
+                        });
+                        
+                    }}
+                    className="text-2xl text-slate-300 hover:text-white transition duration-200 cursor-pointer"
+                >
+                    <CiCirclePlus />
                 </div>
             </div>
 
@@ -106,7 +135,6 @@ const DisplayArtist = () => {
                             <div
                                 onClick={(e) => {
                                     e.stopPropagation();
-                                    
                                 }}
                                 className="text-2xl text-slate-300 hover:text-white transition duration-200 cursor-pointer"
                             >

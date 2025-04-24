@@ -4,6 +4,8 @@ import { FaSearch } from "react-icons/fa";
 import { deleteLikedSong, getAllSongsPlaylist } from "../apis/songApi";
 import { PlayerContext } from "../context/PlayerContext";
 import { CiCircleMinus } from "react-icons/ci";
+import { deleteLikedArtist, getAllArtistlist } from "../apis/artistApi";
+import { useNavigate } from "react-router-dom";
 
 const Sidebar = () => {
     const { playWithId } = useContext(PlayerContext);
@@ -14,36 +16,61 @@ const Sidebar = () => {
     const [input, setInput] = useState("");
     const socketRef = useRef(null);
     const [songPlaylist, setSongPlaylist] = useState([]);
-    
+    const [artistList, setArtistList] = useState([]);
 
-   
+    const navigate = useNavigate();
+    
     useEffect(() => {
         const handlePlaylistUpdated = async () => {
             const data = await getAllSongsPlaylist();
             setSongPlaylist(data);
         };
-    
+
         window.addEventListener("playlist-updated", handlePlaylistUpdated);
-        
+
         return () => {
-            window.removeEventListener("playlist-updated", handlePlaylistUpdated);
+            window.removeEventListener(
+                "playlist-updated",
+                handlePlaylistUpdated
+            );
+        };
+    }, []);
+
+    useEffect(() => {
+        const handleArtistUpdated = async () => {
+            const data = await getAllArtistlist();
+            setArtistList(data);
+        };
+    
+        window.addEventListener("artist-updated", handleArtistUpdated);
+    
+        return () => {
+            window.removeEventListener("artist-updated", handleArtistUpdated);
         };
     }, []);
     
+
     useEffect(() => {
         const fetchAllSongsPlaylist = async () => {
             const data = await getAllSongsPlaylist();
             setSongPlaylist(data);
         };
-    
+
         if (songPlaylist.length === 0) {
             fetchAllSongsPlaylist();
         }
-    }, []); 
-    
-    
+    }, []);
 
-    
+    useEffect(() => {
+        const fetchAllAlbumlist = async () => {
+            const data = await getAllArtistlist();
+            setArtistList(data);
+        };
+
+        if (songPlaylist.length === 0) {
+            fetchAllAlbumlist();
+        }
+    }, []);
 
     useEffect(() => {
         if (!roomId || !connected) return;
@@ -91,10 +118,16 @@ const Sidebar = () => {
             setSongPlaylist((prevSongs) =>
                 prevSongs.filter((song) => song.id !== songId)
             );
-            
         });
     }
-    
+    function handleUnlikeArtist(artistId) {
+        deleteLikedArtist(artistId).then(() => {
+            setArtistList((prevArtists) =>
+                prevArtists.filter((artist) => artist.id !== artistId)
+            );
+        });
+    }
+
 
     return (
         <div className="sidebar w-[25%] h-full p-2 hidden lg:flex flex-col gap-2 text-white">
@@ -170,7 +203,44 @@ const Sidebar = () => {
                         ))}
                     </div>
                 )}
-                {selectedTab === "artists" && <div>💿 Danh sách Nghệ sĩ</div>}
+                {selectedTab === "artists" && (
+                    <div>
+                        <div>
+                            <h2 className="text-sm font-bold mb-3">
+                                📂 Danh sách Artist
+                            </h2>
+                            {artistList.map((item, index) => (
+                                <div
+                                    key={index}
+                                    className="flex items-center gap-2 p-2 hover:bg-[#1e1e1e] rounded-lg cursor-pointer"
+                                    onClick={() => {
+                                        navigate(`/artist/${item.artist?.id}`);
+                                    }}
+                                >
+                                    <img
+                                        className="w-10 h-10 rounded-full"
+                                        src={item.artist?.image}
+                                        alt={item.artist?.name}
+                                    />
+                                    <div className="flex flex-col">
+                                        <span className="font-semibold">
+                                            {item.artist?.name}
+                                        </span>
+                                    </div>
+                                    <div
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleUnlikeArtist(item.id);
+                                        }}
+                                        className="ml-auto text-2xl text-slate-300 hover:text-white transition duration-200 cursor-pointer"
+                                    >
+                                        <CiCircleMinus />
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
                 {selectedTab === "albums" && <div>👨‍🎤 Danh sách Album</div>}
 
                 {selectedTab === "chat" && (
