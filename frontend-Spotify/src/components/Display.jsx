@@ -8,6 +8,15 @@ import ForgotPassword from "./ForgotPassword";
 import Register from "./Register";
 import Premium from "./Premium";
 import DisplayArtist from "./DisplayArtist";
+import DisplayVideo from "./DisplayVideo";
+import VideoDetail from "./VideoDetail";
+// import Chat from "./Chat";
+
+// const currentUser = {
+//     username: localStorage.getItem("currentUser"), 
+//     role: localStorage.getItem("role"), 
+// };
+
 
 const Display = () => {
     return (
@@ -21,6 +30,9 @@ const Display = () => {
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/forgotpassword" element={<ForgotPassword />} />
                 <Route path="/premium" element={<Premium />} />
+                <Route path="/video" element={<DisplayVideo />} />
+                <Route path="/video/:id" element={<VideoDetail />} />
+                {/* <Route path="/chat" element={<Chat currentUser={currentUser} />} />  */}
             </Routes>
         </div>
     );

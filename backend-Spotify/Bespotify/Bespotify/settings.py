@@ -40,11 +40,11 @@ INSTALLED_APPS = [
     'users', 
     'music',
     'channels',
-    'chat',
     'corsheaders',
     'emails',
-    
-
+    'videos',
+    'rest_framework',
+    'chats',
 ]
 ASGI_APPLICATION = "Bespotify.asgi.application"
 
@@ -99,6 +99,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'Bespotify.wsgi.application'
+
 
 
 # Database
@@ -168,6 +169,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
+    "http://127.0.0.1:5174",
+    "http://localhost:5174",
 ]
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

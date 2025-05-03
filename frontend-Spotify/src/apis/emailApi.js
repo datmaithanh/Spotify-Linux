@@ -38,9 +38,7 @@ export async function handleVerifyOtp(newEmail, otp, accessToken, setDetailUserD
             }
         );
 
-        toast.success("Đổi email thành công!");
-
-        
+        toast.success("Đổi email thành công!"); 
         setDetailUserData((prev) => ({
             ...prev,
             email: newEmail,
@@ -76,18 +74,14 @@ export const resetOtpPassword = async (email, setEmail, setLoading) => {
 
 export const resetPassword = async ({ email, otp, password, setEmail, setLoading }) => {
     setLoading(true); // Bắt đầu quá trình
-    console.log("email", email);
-    console.log("otp", otp);
-    console.log("password", password);
     try {
         await axios.post("http://127.0.0.1:8000/api/emails/verify-reset-password-otp/", {
             email: email,
             otp: otp,
             new_password: password,
-        });
-        
+        }); 
         toast.success("Mật khẩu đã được đặt lại thành công!");
-        setEmail(""); // Xóa email sau khi hoàn tất
+        setEmail("");
         
     } catch (error) {
         toast.error(

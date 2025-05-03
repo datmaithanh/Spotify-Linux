@@ -50,3 +50,14 @@ class LikedArtist(models.Model):
 
     def __str__(self):
         return f"{self.user.username} liked {self.song.title}"
+
+class LikedAlbum(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='liked_albums', on_delete=models.CASCADE)
+    album = models.ForeignKey(Album, related_name='liked_by_users', on_delete=models.CASCADE)
+    liked_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'album')
+
+    def __str__(self):
+        return f"{self.user.username} liked {self.album.title}"

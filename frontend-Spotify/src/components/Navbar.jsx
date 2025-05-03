@@ -4,6 +4,7 @@ import { assets } from "../assets/assets";
 import { useNavigate } from "react-router-dom";
 import { FaSearch } from "react-icons/fa";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
+import { detailUser } from "../apis/loginApi";
 
 const Navbar = () => {
     const navigate = useNavigate();
@@ -15,6 +16,8 @@ const Navbar = () => {
 
     const [menuOpen, setMenuOpen] = useState(false);
     const menuRef = useRef();
+    const accessToken = localStorage.getItem("accessToken");
+    const [user, setUser] = useState([]);
 
     const handleLogout = () => {
         localStorage.removeItem("accessToken");
@@ -26,6 +29,10 @@ const Navbar = () => {
     const handleProfile = () => {
         setMenuOpen(false);
         navigate("/profile");
+    };
+    const handleAdmin = () => {
+        setMenuOpen(false);
+        navigate("/admin/users");
     };
 
     useEffect(() => {
@@ -39,6 +46,14 @@ const Navbar = () => {
             document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
+    useEffect(() => {
+        const fetchUser = async () => {
+            const data = await detailUser(accessToken);
+            setUser(data);
+        };
+        fetchUser();
+    }, []);
+
     return (
         <div className="text-white h-[10%] w-full flex px-4 justify-between items-center">
             <div className="flex items-center gap-2">
@@ -47,11 +62,7 @@ const Navbar = () => {
                     className="p-[6px] text-2xl cursor-pointer rounded-sm"
                 >
                     {/* <IoLogoSlack className=""></IoLogoSlack> */}
-                    <img
-                        src={assets.logo}
-                        alt=""
-                        className="w-10 rounded-sm"
-                    />
+                    <img src={assets.logo} alt="" className="w-10 rounded-sm" />
                 </div>
                 <button
                     onClick={() => navigate("/")}
@@ -123,6 +134,19 @@ const Navbar = () => {
                                     <span>Profile</span>
                                 </button>
                             </MenuItem>
+
+                            {user?.data?.role === "admin" && (
+                                
+                                <MenuItem>
+                                    <button
+                                        onClick={handleAdmin}
+                                        className="rounded-sm px-3 py-2 w-full text-left data-[focus]:bg-[#ffffff26] flex justify-between items-center"
+                                    >
+                                        <span>Admin</span>
+                                    </button>
+                                </MenuItem>
+                            )}
+
                             <MenuItem>
                                 <button
                                     onClick={handleLogout}

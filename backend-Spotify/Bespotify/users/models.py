@@ -6,6 +6,7 @@ class CustomUser(AbstractUser):
     vip_expiry = models.DateTimeField(null=True, blank=True)
     role = models.CharField(max_length=10, default='user', choices=[('user', 'User'), ('admin', 'Admin')])
     avatar = models.ImageField(upload_to='avatars/', null=True, blank=True)
+    friends = models.ManyToManyField('self', symmetrical=True, blank=True)
 
     def __str__(self):
         return self.username

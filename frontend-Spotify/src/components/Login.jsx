@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { loginGoogle, loginUser } from "../apis/loginApi";
+import { detailUser, loginGoogle, loginUser } from "../apis/loginApi";
 import { GoogleLogin } from "@react-oauth/google";
 
 const Login = () => {
@@ -18,6 +18,8 @@ const Login = () => {
 
             localStorage.setItem("currentUser", userName);
             localStorage.setItem("accessToken", response.data.access);
+            const detailU = await detailUser(response.data.access);
+            localStorage.setItem("role", detailU.data.role);
             navigate("/");
         } catch (err) {
             setError("Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.");

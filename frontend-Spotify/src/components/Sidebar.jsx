@@ -6,6 +6,8 @@ import { PlayerContext } from "../context/PlayerContext";
 import { CiCircleMinus } from "react-icons/ci";
 import { deleteLikedArtist, getAllArtistlist } from "../apis/artistApi";
 import { useNavigate } from "react-router-dom";
+import { deleteLikedAlbum, getAllAlbumlist } from "../apis/albumApi";
+import ChatRoom from "./ChatRoom";
 
 const Sidebar = () => {
     const { playWithId } = useContext(PlayerContext);
@@ -17,9 +19,10 @@ const Sidebar = () => {
     const socketRef = useRef(null);
     const [songPlaylist, setSongPlaylist] = useState([]);
     const [artistList, setArtistList] = useState([]);
+    const [albumList, setAlbumList] = useState([]);
 
     const navigate = useNavigate();
-    
+
     useEffect(() => {
         const handlePlaylistUpdated = async () => {
             const data = await getAllSongsPlaylist();
@@ -41,14 +44,26 @@ const Sidebar = () => {
             const data = await getAllArtistlist();
             setArtistList(data);
         };
-    
+
         window.addEventListener("artist-updated", handleArtistUpdated);
-    
+
         return () => {
             window.removeEventListener("artist-updated", handleArtistUpdated);
         };
     }, []);
-    
+
+    useEffect(() => {
+        const handleAlbumUpdated = async () => {
+            const data = await getAllAlbumlist();
+            setAlbumList(data);
+        };
+
+        window.addEventListener("album-updated", handleAlbumUpdated);
+
+        return () => {
+            window.removeEventListener("album-updated", handleAlbumUpdated);
+        };
+    }, []);
 
     useEffect(() => {
         const fetchAllSongsPlaylist = async () => {
@@ -62,56 +77,27 @@ const Sidebar = () => {
     }, []);
 
     useEffect(() => {
-        const fetchAllAlbumlist = async () => {
+        const fetchAllArtistlist = async () => {
             const data = await getAllArtistlist();
             setArtistList(data);
         };
 
-        if (songPlaylist.length === 0) {
-            fetchAllAlbumlist();
+        if (artistList.length === 0) {
+            fetchAllArtistlist();
         }
     }, []);
 
     useEffect(() => {
-        if (!roomId || !connected) return;
-
-        const socket = new WebSocket(`ws://localhost:8000/ws/chat/${roomId}/`);
-        socketRef.current = socket;
-
-        socket.onopen = () => {
-            console.log("✅ Kết nối WebSocket đến:", roomId);
+        const fetchAllAlbumlist = async () => {
+            const data = await getAllAlbumlist();
+            setAlbumList(data);
         };
 
-        socket.onmessage = (e) => {
-            const data = JSON.parse(e.data);
-            setMessages((prev) => [...prev, data]);
-        };
-
-        socket.onerror = (err) => {
-            console.error("⚠️ WebSocket Error:", err);
-        };
-
-        socket.onclose = () => {
-            console.log("❌ WebSocket ngắt kết nối");
-        };
-
-        return () => {
-            socketRef.current?.close();
-        };
-    }, [roomId, connected]);
-
-    const sendMessage = () => {
-        if (input.trim() && socketRef.current) {
-            socketRef.current.send(
-                JSON.stringify({ message: input, sender: username })
-            );
-            setInput("");
+        if (albumList.length === 0) {
+            fetchAllAlbumlist();
         }
-    };
+    }, []);
 
-    const handleConnect = () => {
-        if (roomId.trim()) setConnected(true);
-    };
 
     function handleUnlike(songId) {
         deleteLikedSong(songId).then(() => {
@@ -124,6 +110,14 @@ const Sidebar = () => {
         deleteLikedArtist(artistId).then(() => {
             setArtistList((prevArtists) =>
                 prevArtists.filter((artist) => artist.id !== artistId)
+            );
+        });
+    }
+
+    function handleUnlikeAlbum(albumId) {
+        deleteLikedAlbum(albumId).then(() => {
+            setAlbumList((prevAlbums) =>
+                prevAlbums.filter((album) => album.id !== albumId)
             );
         });
     }
@@ -241,74 +235,48 @@ const Sidebar = () => {
                         </div>
                     </div>
                 )}
-                {selectedTab === "albums" && <div>👨‍🎤 Danh sách Album</div>}
+                {selectedTab === "albums" && (
+                    <div>
+                        <div>
+                            <h2 className="text-sm font-bold mb-3">
+                                📂 Danh sách Album
+                            </h2>
+                            {albumList.map((item, index) => (
+                                <div
+                                    key={index}
+                                    className="flex items-center gap-2 p-2 hover:bg-[#1e1e1e] rounded-lg cursor-pointer"
+                                    onClick={() => {
+                                        navigate(`/album/${item.album?.id}`);
+                                    }}
+                                >
+                                    <img
+                                        className="w-10 h-10 rounded-full"
+                                        src={item.album?.image}
+                                        alt={item.album?.title}
+                                    />
+                                    <div className="flex flex-col">
+                                        <span className="font-semibold">
+                                            {item.album?.title}
+                                        </span>
+                                    </div>
+                                    <div
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleUnlikeAlbum(item.id);
+                                        }}
+                                        className="ml-auto text-2xl text-slate-300 hover:text-white transition duration-200 cursor-pointer"
+                                    >
+                                        <CiCircleMinus />
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
 
                 {selectedTab === "chat" && (
-                    <div className="bg-[#1e1e1e] p-4 rounded-2xl shadow-lg border border-[#333]">
-                        <h2 className="text-sm font-bold mb-3">💬 Chat Room</h2>
-
-                        {!connected ? (
-                            <>
-                                <input
-                                    className="w-full text-black px-3 py-2 rounded-lg text-sm mb-3"
-                                    type="text"
-                                    value={roomId}
-                                    onChange={(e) => setRoomId(e.target.value)}
-                                    placeholder="Nhập tên phòng (vd: room123)"
-                                />
-                                <button
-                                    onClick={handleConnect}
-                                    className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded-lg w-full"
-                                >
-                                    🚪 Tham gia phòng
-                                </button>
-                            </>
-                        ) : (
-                            <>
-                                <div className="text-sm text-gray-300 mb-3">
-                                    Đã kết nối đến{" "}
-                                    <strong className="text-white">
-                                        {roomId}
-                                    </strong>
-                                </div>
-
-                                <div className="h-48 overflow-y-auto bg-[#2b2b2b] p-3 rounded-xl mb-3 flex flex-col gap-2 scroll-smooth">
-                                    {messages.map((msg, i) => (
-                                        <div
-                                            key={i}
-                                            className={`max-w-[75%] px-4 py-2 rounded-xl break-words text-white ${
-                                                msg.sender === username
-                                                    ? "self-end bg-gradient-to-br from-blue-500 to-blue-700 text-right"
-                                                    : "self-start bg-neutral-700 text-left"
-                                            }`}
-                                        >
-                                            {msg.message}
-                                        </div>
-                                    ))}
-                                </div>
-
-                                <div className="flex gap-2">
-                                    <input
-                                        className="flex-1 text-black px-3 py-2 rounded-lg text-sm"
-                                        type="text"
-                                        value={input}
-                                        onChange={(e) =>
-                                            setInput(e.target.value)
-                                        }
-                                        onKeyDown={(e) =>
-                                            e.key === "Enter" && sendMessage()
-                                        }
-                                        placeholder="Nhập tin nhắn..."
-                                    />
-                                    <button
-                                        onClick={sendMessage}
-                                        className="bg-green-600 hover:bg-green-700 text-white text-sm px-4 py-2 rounded-lg"
-                                    >
-                                        📤 Gửi
-                                    </button>
-                                </div>
-                            </>
-                        )}
+                    <div>
+                        <ChatRoom/>
                     </div>
                 )}
             </div>

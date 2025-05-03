@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { assets } from "../assets/assets";
 import { useParams } from "react-router-dom";
 import { PlayerContext } from "../context/PlayerContext";
-import { getAllAlbum } from "../apis/albumApi";
+import { addToAlbumList, getAllAlbum } from "../apis/albumApi";
 import { CiCirclePlus } from "react-icons/ci";
 import { addToPlaylist } from "../apis/songApi";
 
@@ -26,11 +26,15 @@ const DisplayAlbum = () => {
     return (
         <>
             <div className="mt-10 flex gap-8 flex-col md:flex-row md:items-end">
-                <img className="w-48 rounded" src={album[0]?.image} alt="" />
+                <img
+                    className="w-48 rounded"
+                    src={album[id - 1]?.image}
+                    alt=""
+                />
                 <div className="flex flex-col">
                     <p>Album</p>
                     <h2 className="text-5xl font-bold mb-4 md:text-7xl">
-                        {album[0]?.title}
+                        {album[id - 1]?.title}
                     </h2>
                     <h4>{album.desc}</h4>
                     <p className="mt-1">
@@ -41,6 +45,18 @@ const DisplayAlbum = () => {
                         />
                         <b> Spotify </b>
                     </p>
+                </div>
+                <div
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        addToAlbumList(album[id-1]?.id).then(() => {
+                            const event = new Event("album-updated");
+                            window.dispatchEvent(event);
+                        });
+                    }}
+                    className="text-2xl text-slate-300 hover:text-white transition duration-200 cursor-pointer"
+                >
+                    <CiCirclePlus />
                 </div>
             </div>
 
@@ -54,7 +70,7 @@ const DisplayAlbum = () => {
             </div>
             <hr />
 
-            {album[0]?.songs.map((item, index) => (
+            {album[id - 1]?.songs.map((item, index) => (
                 <div
                     key={index}
                     className="grid grid-cols-3 sm:grid-cols-4 gap-2 p-2 items-center text-[#a7a7a7] hover:bg-[#ffffff2b] cursor-pointer"
@@ -74,9 +90,9 @@ const DisplayAlbum = () => {
                             </div>
                         </div>
                     </div>
-                    <p className="text-[15px]">{album[0]?.title}</p>
+                    <p className="text-[15px]">{album[id - 1]?.title}</p>
                     <p className="text-[15px] hidden sm:block">
-                        {album[0]?.release_date}
+                        {album[id - 1]?.release_date}
                     </p>
                     <div className="flex justify-center gap-4 items-center text-[15px] px-2">
                         <div className="text-slate-400">

@@ -1,6 +1,6 @@
 from rest_framework.views import APIView
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from django.contrib.auth import get_user_model
 from rest_framework.renderers import JSONRenderer
 from rest_framework.decorators import api_view
@@ -9,8 +9,8 @@ from google.oauth2 import id_token
 from google.auth.transport import requests
 from django.contrib.auth.models import User
 from rest_framework_simplejwt.tokens import RefreshToken
-
-from .serializers import RegisterSerializer
+from rest_framework import generics
+from .serializers import RegisterSerializer, UserSerializer, UserUpdateSerializer
 
 User = get_user_model()
 
@@ -30,6 +30,7 @@ class CurrentUserView(APIView):
     def get(self, request):
         user = request.user
         return Response({
+            'id': user.id,
             'username': user.username,
             'email': user.email,
             'is_vip': user.is_vip,
@@ -94,3 +95,32 @@ def google_login(request):
     except ValueError as e:
         print(e)
         return Response({"error": "Invalid token"}, status=status.HTTP_400_BAD_REQUEST)
+    
+User = get_user_model()
+
+class UserListAPIView(generics.ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user_id = self.kwargs.get('pk')  
+        if user_id:
+            return User.objects.filter(id=user_id)
+        return User.objects.all()
+
+class UserUpdateAPIView(generics.UpdateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserUpdateSerializer
+    permission_classes = [IsAdminUser]  # Chỉ cho phép admin cập nhật thông tin người dùng
+
+
+class UserDeleteAPIView(generics.DestroyAPIView):
+    queryset = User.objects.all()
+    permission_classes = [IsAdminUser]
+
+    def destroy(self, request, *args, **kwargs):
+        user = self.get_object()
+        if user == request.user:
+            return Response({"detail": "Không thể tự xóa chính mình."}, status=400)
+        return super().destroy(request, *args, **kwargs)
