@@ -6,13 +6,13 @@
 - Django REST Framework
 - WebSocket (Django Channels)
 - ReactJS
-- PostgreSQL
+- MySQL
 
 ## 🚀 Cách cài đặt
 
 ```bash
 # 1. Clone repo
-git clone https://github.com/datmaithanh/music-chat-app.git
+git clone [https://github.com/datmaithanh/music-chat-app.git](https://github.com/datmaithanh/Spotify-Linux.git)
 cd music-chat-app
 
 # 2. Cài backend
