@@ -23,4 +23,4 @@ python manage.py runserver
 # 3. Cài frontend
 cd ../frontend
 npm install
-npm start
+npm run dev
