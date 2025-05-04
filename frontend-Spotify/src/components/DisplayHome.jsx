@@ -56,12 +56,20 @@ const DisplayHome = () => {
                                 Music
                             </button>
                         </div>
-                        <div className="flex mb-4">
+                        <div className="flex mb-4 mr-4">
                             <button
                                 onClick={() => navigate("/video")}
                                 className="bg-[#121212] hover:bg-gray-700 text-white px-6 py-3 rounded-lg border-2 border-gray-700 hover:border-gray-500 shadow-md transition-all duration-200 transform hover:scale-105"
                             >
                                 Video
+                            </button>
+                        </div>
+                        <div className="flex mb-4">
+                            <button
+                                onClick={() => navigate("/friend")}
+                                className="bg-[#121212] hover:bg-gray-700 text-white px-6 py-3 rounded-lg border-2 border-gray-700 hover:border-gray-500 shadow-md transition-all duration-200 transform hover:scale-105"
+                            >
+                                Friend
                             </button>
                         </div>
                     </div>

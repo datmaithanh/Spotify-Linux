@@ -131,7 +131,7 @@ const ChatRoom = () => {
     };
 
     return (
-        <div className="max-w-sm mx-auto bg-white shadow rounded-md h-[300px] flex flex-col overflow-hidden">
+        <div className="max-w-sm mx-auto bg-white shadow rounded-md h-[350px] flex flex-col overflow-hidden">
             <div className="flex-shrink-0">
                 <ListFriend
                     friendList={friendList}

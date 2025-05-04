@@ -76,3 +76,40 @@ export async function sendMessege(chatId, content, accessToken) {
         return [];
     }
 }
+
+export async function getFriendRequest(accessToken) {
+    try {
+        const response = await axios.get(
+            "http://127.0.0.1:8000/api/friend-requests/received/",
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${accessToken}`,
+                },
+            }
+        );
+        return response.data;
+    } catch (error) {
+        console.error(error);
+        return [];
+    }
+}
+
+export async function acceptFriend(requestAcceptId, accessToken) {
+    try {
+        const response = await axios.post(
+            `http://127.0.0.1:8000/api/friend-requests/${requestAcceptId}/accept/`,
+            {},
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${accessToken}`,
+                },
+            }
+        );
+        return response.data;
+    } catch (error) {
+        console.error(error);
+        return [];
+    }
+}

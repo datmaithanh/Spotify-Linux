@@ -11,5 +11,6 @@ urlpatterns = [
     path('friends/', friend_list, name='friend-list'),
     path('chat/get-or-create/', get_or_create_chat, name='get_or_create_chat'),
     path('chats/<int:chat_id>/messages/', MessageListView.as_view(), name='chat-messages'),
+    path('friend-requests/received/', received_friend_requests, name='received_friend_requests'),
     path('', include(router.urls)),
 ]

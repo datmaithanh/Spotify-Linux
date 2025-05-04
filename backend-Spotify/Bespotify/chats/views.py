@@ -80,6 +80,21 @@ def friend_list(request):
     serializer = UserSerializer(friends, many=True)
     return Response(serializer.data)
 
+# views.py
+
+@api_view(['GET'])
+@permission_classes([permissions.IsAuthenticated])
+def received_friend_requests(request):
+    user = request.user
+
+    pending_requests = FriendRequest.objects.filter(
+        to_user=user,
+        accepted=False
+    ).select_related('from_user')
+
+    serializer = FriendRequestSerializer(pending_requests, many=True)
+    return Response(serializer.data)
+
 
 @api_view(['POST'])
 @permission_classes([permissions.IsAuthenticated])

@@ -148,14 +148,7 @@ const Sidebar = () => {
                         </button>
                     ))}
                 </div>
-                <div className="relative group mb-3 mx-3">
-                    <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-zinc-400 group-hover:text-green-500 transition-colors" />
-                    <input
-                        type="text"
-                        placeholder="Search chats"
-                        className="text-white w-full bg-zinc-800/50 rounded-full py-2 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-green-500/50 transition-all placeholder-zinc-500"
-                    />
-                </div>
+                
             </div>
 
             {/* Tab Content */}

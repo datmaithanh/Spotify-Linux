@@ -10,6 +10,10 @@ import Premium from "./Premium";
 import DisplayArtist from "./DisplayArtist";
 import DisplayVideo from "./DisplayVideo";
 import VideoDetail from "./VideoDetail";
+import DisplayFriend from "./DisplayFriend";
+import DisplayFriendRequest from "./DisplayFriendRequest";
+import DisplaySearchFriend from "./DisplaySearchFriend";
+import SearchFriend from "./SearchFriend";
 // import Chat from "./Chat";
 
 // const currentUser = {
@@ -32,6 +36,9 @@ const Display = () => {
                 <Route path="/premium" element={<Premium />} />
                 <Route path="/video" element={<DisplayVideo />} />
                 <Route path="/video/:id" element={<VideoDetail />} />
+                <Route path="/friend" element={<DisplayFriend />} />
+                <Route path="/friend/request" element={<DisplayFriendRequest />} />
+                <Route path="/friend/searchfriend" element={<SearchFriend />} />
                 {/* <Route path="/chat" element={<Chat currentUser={currentUser} />} />  */}
             </Routes>
         </div>

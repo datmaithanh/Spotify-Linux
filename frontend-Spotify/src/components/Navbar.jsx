@@ -87,15 +87,7 @@ const Navbar = () => {
                 />
             </div>
 
-            {/* Search bar */}
-            <div className="relative group min-w-lg">
-                <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-zinc-400 group-hover:text-green-500 transition-colors" />
-                <input
-                    type="text"
-                    placeholder="Search chats"
-                    className="text-white w-full bg-[#1f1f1f] rounded-full py-2 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-green-500/50 transition-all placeholder-zinc-500"
-                />
-            </div>
+            
 
             {/* Premium + Avatar + Menu */}
             <div className="flex items-center gap-4" ref={menuRef}>
