@@ -9,13 +9,16 @@ import { addToPlaylist } from "../apis/songApi";
 const DisplayAlbum = () => {
     const { id } = useParams();
     const [album, setAlbum] = useState([]);
+    const [albums, setAlbums] = useState([]);
     useEffect(() => {
         const fetchAlbums = async () => {
             const data = await getAllAlbum();
-            setAlbum(data);
+            setAlbums(data);
+            const selected = data.find((item) => item.id === parseInt(id));
+            setAlbum(selected);
         };
         fetchAlbums();
-    }, []);
+    }, [id]);
     const formatDuration = (seconds) => {
         const mins = Math.floor(seconds / 60);
         const secs = seconds % 60;
@@ -23,20 +26,18 @@ const DisplayAlbum = () => {
     };
     const { playWithId } = useContext(PlayerContext);
 
+    console.log(album);
+
     return (
         <>
             <div className="mt-10 flex gap-8 flex-col md:flex-row md:items-end">
-                <img
-                    className="w-48 rounded"
-                    src={album[id - 1]?.image}
-                    alt=""
-                />
+                <img className="w-48 rounded" src={album?.image} alt="" />
                 <div className="flex flex-col">
                     <p>Album</p>
                     <h2 className="text-5xl font-bold mb-4 md:text-7xl">
-                        {album[id - 1]?.title}
+                        {album?.title}
                     </h2>
-                    <h4>{album.desc}</h4>
+                    <h4>{album?.desc}</h4>
                     <p className="mt-1">
                         <img
                             className="inline-block w-5"
@@ -49,7 +50,7 @@ const DisplayAlbum = () => {
                 <div
                     onClick={(e) => {
                         e.stopPropagation();
-                        addToAlbumList(album[id-1]?.id).then(() => {
+                        addToAlbumList(album?.id).then(() => {
                             const event = new Event("album-updated");
                             window.dispatchEvent(event);
                         });
@@ -70,7 +71,7 @@ const DisplayAlbum = () => {
             </div>
             <hr />
 
-            {album[id - 1]?.songs.map((item, index) => (
+            {album?.songs?.map((item, index) => (
                 <div
                     key={index}
                     className="grid grid-cols-3 sm:grid-cols-4 gap-2 p-2 items-center text-[#a7a7a7] hover:bg-[#ffffff2b] cursor-pointer"
@@ -92,7 +93,7 @@ const DisplayAlbum = () => {
                     </div>
                     <p className="text-[15px]">{album[id - 1]?.title}</p>
                     <p className="text-[15px] hidden sm:block">
-                        {album[id - 1]?.release_date}
+                        {album?.release_date}
                     </p>
                     <div className="flex justify-center gap-4 items-center text-[15px] px-2">
                         <div className="text-slate-400">

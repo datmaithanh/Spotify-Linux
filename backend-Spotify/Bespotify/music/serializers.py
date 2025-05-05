@@ -11,8 +11,7 @@ class SongSerializer(serializers.ModelSerializer):
         fields = ['id', 'title', 'duration', 'album_id', 'audio_url', 'image', 'album_name', 'artist_name']
         
     def create(self, validated_data):
-        album_data = validated_data.pop('album')
-        album_id = album_data['id']
+        album_id = validated_data.pop('album_id')
         album = Album.objects.get(id=album_id)
         song = Song.objects.create(album=album, **validated_data)
         return song
